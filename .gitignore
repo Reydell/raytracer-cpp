@@ -1,0 +1,4 @@
+.clangd
+examples/
+.questions.md
+build/
