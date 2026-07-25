@@ -97,7 +97,7 @@ int main() {
     //     Vector{-105, -38, -281}
     // };
     // Scene scene;
-    // reader.ReadFile(scene, "tests/deer/CERF_Free.obj");
+    // reader.ReadFile(scene, "deer");
     // Camera camera{
     //     kWidth,
     //     kHeight,
@@ -105,7 +105,7 @@ int main() {
     //     Vector{0, 0, -1}    
     // };
     Scene scene;
-    reader.ReadFile(scene, "tests/box/cube.obj");
+    reader.ReadFile(scene, "heart");
     Camera camera{
         kWidth,
         kHeight
@@ -129,24 +129,32 @@ int main() {
 
         const bool *keyboard = SDL_GetKeyboardState(nullptr);
 
+        bool hasMoved = false;
+
         Vector offset{0, 0, 0};
         if (keyboard[SDL_SCANCODE_A]) {
             offset += Vector{-1, 0, 0};
+            hasMoved = true;
         }
         if (keyboard[SDL_SCANCODE_D]) {
             offset += Vector{1, 0, 0};
+            hasMoved = true;
         }
         if (keyboard[SDL_SCANCODE_W]) {
             offset += Vector{0, 0, 1};
+            hasMoved = true;
         }
         if (keyboard[SDL_SCANCODE_S]) {
             offset += Vector{0, 0, -1};
+            hasMoved = true;
         }
         if (keyboard[SDL_SCANCODE_LCTRL]) {
             offset += Vector{0, -1, 0};
+            hasMoved = true;
         }
         if (keyboard[SDL_SCANCODE_SPACE]) {
             offset += Vector{0, 1, 0};
+            hasMoved = true;
         }
         offset.Normalize();
         camera.Move(offset * kMovementSpeed);
@@ -159,19 +167,22 @@ int main() {
             Vector rotationAxisX = Vector(1, 0, 0) * -mouseDeltaY;
 
             if (mouseDeltaX or mouseDeltaY) {
+                hasMoved = true;
                 camera.Rotate(rotationAxisY, kRotationSpeed);
                 camera.Rotate(rotationAxisX, kRotationSpeed);
             }
             
         }
+        if (hasMoved) {
+            const auto start = std::chrono::steady_clock::now();
+            Image img = raytracer.RenderMT(camera, scene);
+            const auto end = std::chrono::steady_clock::now();
+            const std::chrono::duration<float> elapsed = end - start;
+            std::cout << "\rRender time: " << elapsed.count()  << " seconds" << std::flush;
 
-        const auto start = std::chrono::steady_clock::now();
-        Image img = raytracer.RenderMT(camera, scene);
-        const auto end = std::chrono::steady_clock::now();
-        const std::chrono::duration<float> elapsed = end - start;
-        std::cout << "\rRender time: " << elapsed.count()  << " seconds" << std::flush;
-
-        UploadPixelArrayToTexture(texture, img, kWidth, kHeight);
+            UploadPixelArrayToTexture(texture, img, kWidth, kHeight);
+        }
+        
 
 
         if (!SDL_SetRenderDrawColor(

@@ -1,7 +1,7 @@
 # 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
 # File Created: 25.09.2020 16:04:53
 
-mtllib CERF_Free.mtl
+mtllib scene.mtl
 
 #
 # object ORIGAMI_Cerf
@@ -2878,4 +2878,3 @@ f 372/876/571 502/722/571 501/721/571 379/875/571
 f 378/528/572 373/520/572 372/519/572 379/529/572 
 f 354/501/573 373/520/573 368/515/573 355/502/573 
 # 664 polygons
-

@@ -1,0 +1,28 @@
+# glassy: clear sphere inside a subtly green mirrored corner
+# Intended camera: position (0, 0, 0), forward (0, 0, -1)
+# The sphere sits 0.05 units above the XZ ground plane.
+
+mtllib scene.mtl
+
+usemtl Ground
+plane 0 -1.40 0 0 1 0
+
+# Two square mirror panels meet at a 90-degree vertical seam.
+v  0.00000 -1.40 -8.00000
+v  0.00000  2.80 -8.00000
+v -2.96985  2.80 -5.03015
+v -2.96985 -1.40 -5.03015
+v  2.96985 -1.40 -5.03015
+v  2.96985  2.80 -5.03015
+
+usemtl GreenMirror
+f 1 2 3 4
+f 1 5 6 2
+
+usemtl ClearGlass
+S 0 -0.35 -4.80 1.00
+
+# Key, fill, and green-tinted rim lights.
+P -3.5 4.5 -1.0 0.72 0.68 0.62
+P  3.5 2.5 -2.0 0.30 0.42 0.72
+P  0.0 3.0 -6.5 0.18 0.44 0.24

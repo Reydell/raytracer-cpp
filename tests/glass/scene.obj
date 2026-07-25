@@ -1,7 +1,7 @@
 # Glass refraction test scene
 # Intended camera: position (0, 0, 0), forward (0, 0, -1)
 
-mtllib Glass.mtl
+mtllib scene.mtl
 
 # Neutral background and floor make the glass silhouette visible.
 usemtl Backdrop

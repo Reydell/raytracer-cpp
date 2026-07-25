@@ -34,19 +34,22 @@ struct Material {
 
     float refractionIndex; // for angles
     
-    float transparency; // Tr = 1 - d
-    float reflectivity;
+    float transparency; // Tr = 1 - d al2
+    float reflectivity; // al1
+    float lightsConstant; // al0
 
     float specExponent;
 
     Material(
         Color emitted = {0, 0, 0},
-        Color diffused = {.5, .5, .5},
-        Color specular = {.1, .1, .2},
+        Color ambient = {0, 0, 0},
+        Color diffused = {0, 0, 0},
+        Color specular = {0, 0, 0},
         Color tint = {1, 1, 1}, 
         float refractionIndex = 1.3f,
         float transparency = 0,
         float reflectivity = 0,
-        float specExponent = 32
+        float lightsConstant = 1,
+        float specExponent = 300
     );
 };

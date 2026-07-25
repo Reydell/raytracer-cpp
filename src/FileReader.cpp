@@ -76,6 +76,12 @@ std::unordered_map<std::string, Material> FileReader::ReadMtl(const std::string&
                 float r, g, b;
                 parser >> r >> g >> b;
                 newMaterial.emitted = Color{r, g, b};
+            } else if (entryType == "al") {
+                float al0, al1, al2;
+                parser >> al0 >> al1 >> al2;
+                newMaterial.lightsConstant = al0;
+                newMaterial.reflectivity = al1;
+                newMaterial.transparency = al2;
             }
         }
 
@@ -88,10 +94,11 @@ std::unordered_map<std::string, Material> FileReader::ReadMtl(const std::string&
 }
 
 void FileReader::ReadFile(Scene& scene, const std::string& objPath) const {
-    std::ifstream file(objPath);
+    const std::filesystem::path objFilePath =
+        std::filesystem::path("tests") / objPath / "scene.obj";
+    std::ifstream file(objFilePath);
     std::string line;
-    const std::filesystem::path objDirectory =
-        std::filesystem::path(objPath).parent_path();
+    const std::filesystem::path objDirectory = objFilePath.parent_path();
 
     std::vector<Vector> vertices;
     std::vector<std::array<Vector, 3>> faces;

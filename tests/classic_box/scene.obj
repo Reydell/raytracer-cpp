@@ -9,7 +9,7 @@
 # http://www.graphics.cornell.edu/online/box/data.html
 #
 
-mtllib CornellBox-Original.mtl
+mtllib scene.mtl
 
 ## Object floor
 v  -1.01  0.00   0.99
@@ -61,13 +61,8 @@ g leftWall
 usemtl leftWall
 f -4 -3 -2 -1
 
-usemtl frontWall1
-v 0 0 0.99
-v 0 1.99 0.99
-f -6 -3 -1 -2
-
-usemtl frontWall2
-f -2 -1 -8 -9
+usemtl frontWall
+f -4 -1 -6 -7
 
 ## Object shortBox 
 usemtl shortBox

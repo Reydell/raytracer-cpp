@@ -88,14 +88,14 @@ Color RayTracer::TraceRayRecursive(
 
         Color diffused = intersection->material.diffused * light->color * dotNormViewlight;
 
-        totalLight += diffused;
+        totalLight += intersection->material.lightsConstant * diffused;
 
         //specular
         Vector viewReflect = 2 * dotNormViewlight * intersection->normal - viewLight;
 
         float dotReflectEye = std::max(0.f, Dot(viewReflect, viewEye));
 
-        totalLight += intersection->material.specular * light->color * std::pow(dotReflectEye, intersection->material.specExponent);
+        totalLight += intersection->material.lightsConstant * intersection->material.specular * light->color * std::pow(dotReflectEye, intersection->material.specExponent);
     }
 
     if (recursionDepth == 1) {
@@ -106,7 +106,7 @@ Color RayTracer::TraceRayRecursive(
     Vector dirReflected = 2 * dotNormVieweye * intersection->normal - viewEye;
 
     // reflected ray calculation
-    if (!isInside && !(intersection->material.specular.IsZero())) {
+    if (!isInside && (intersection->material.reflectivity > 0.f)) {
         Color reflected = TraceRayRecursive(
             Ray{intersection->point + 1e-4f * dirReflected, dirReflected}, 
             scene,
@@ -115,7 +115,7 @@ Color RayTracer::TraceRayRecursive(
             refractionIndex
         );
 
-        totalLight += intersection->material.specular * reflected;
+        totalLight += intersection->material.reflectivity * reflected;
     }
 
     // refracted ray calculation

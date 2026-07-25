@@ -72,21 +72,24 @@ Color operator*(const Color& left, float right) {
 
 Material::Material(
     Color emitted,
+    Color ambient,
     Color diffused,
     Color specular,
     Color tint,
     float refractionIndex,
     float transparency,
     float reflectivity,
+    float lightsConstant,
     float specExponent
 ) : emitted(emitted),
     diffused(diffused),
+    ambient(ambient),
     specular(specular),
     tint(tint),
     refractionIndex(refractionIndex),
     transparency(transparency),
+    lightsConstant(lightsConstant),
     specExponent(specExponent) 
 {
-    ambient = diffused;
     this->reflectivity = std::min(reflectivity, 1 - transparency);
 }
