@@ -5,12 +5,12 @@
 
 inline const Material MIRROR{
     {0, 0, 0},
-    {.9, .9, .8},
+    {.04, .05, .04},
     {.1, .12, .1},
     {1, 1, 1},
     1.2f,
     0.f,
-    1.f,
+    .99f,
     600.f
 };
 
@@ -127,6 +127,17 @@ inline const Material RED_MATTE{
 inline const Material BLUE_MATTE{
     {0, 0, 0},
     {.05, .1, .8},
+    {.03, .03, .03},
+    {1, 1, 1},
+    1.0f,
+    0.f,
+    0.f,
+    20.f
+};
+
+inline const Material WHITE_MATTE{
+    {0, 0, 0},
+    {.9, .9, .9},
     {.03, .03, .03},
     {1, 1, 1},
     1.0f,

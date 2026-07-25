@@ -148,7 +148,7 @@ Color RayTracer::TraceRayRecursive(
     Vector dirReflected = 2 * dotNormVieweye * intersection->normal - viewEye;
 
     // reflected ray calculation
-    if (!isInside && intersection->material.reflectivity != 0) {
+    if (!isInside && !(intersection->material.specular.IsZero())) {
         Color reflected = TraceRayRecursive(
             Ray{intersection->point + 1e-4f * dirReflected, dirReflected}, 
             scene,
@@ -157,7 +157,7 @@ Color RayTracer::TraceRayRecursive(
             refractionIndex
         );
 
-        totalLight += intersection->material.reflectivity * reflected;
+        totalLight += intersection->material.specular * reflected;
     }
 
     // refracted ray calculation

@@ -125,9 +125,15 @@ Plane::Plane(const Vector& origin, const Vector& normal, const Material& materia
 }
 
 std::optional<Intersection> Plane::Intersect(const Ray& ray) const {
-    float distance 
-        = Dot((_origin - ray.Origin()), _normal) 
-        / Dot(ray.Direction(), _normal);
+    const float denominator = Dot(ray.Direction(), _normal);
+    if (std::abs(denominator) < 1e-6f) {
+        return std::nullopt;
+    }
+
+    const float distance = Dot(_origin - ray.Origin(), _normal) / denominator;
+    if (distance < 1e-4f) {
+        return std::nullopt;
+    }
 
     return Intersection{
         distance,

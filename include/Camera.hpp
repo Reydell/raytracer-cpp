@@ -41,4 +41,5 @@ public:
     Vector Position() const;
 
     void Rotate(const Vector& axis);  // stub
+    void Move(const Vector& offset);
 };

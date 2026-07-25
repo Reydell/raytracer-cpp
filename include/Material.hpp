@@ -21,6 +21,8 @@ struct Color{
 
     friend Color operator*(float left, const Color& right);
     friend Color operator*(const Color& left, float right);
+
+    bool IsZero();
 };
 
 struct Material {

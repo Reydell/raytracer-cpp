@@ -23,7 +23,7 @@
 #include <vector>
 
 
-const size_t kWidth = 400;
+const size_t kWidth = 1200;
 const size_t kHeight = 800;
 
 const Pixel kBackgroundColor{0, 0, 0};
@@ -85,18 +85,44 @@ int main() {
     // Actual raytracer part
 
     RayTracer raytracer{3};
+    // Camera camera{
+    //     kWidth,
+    //     kHeight,
+    //     Vector{105, 150, 290},
+    //     Vector{-105, -38, -281}
+    // };
     Camera camera{
         kWidth,
         kHeight,
-        Vector{105, 150, 290},
-        Vector{-105, -38, -281}
+        Vector{1.5, 1.5, -0.1},
+        Vector{0, 0, -1}    
     };
     Scene scene;
-    reader.ReadFile(scene, "tests/deer.obj");
-    scene.AddLight(std::make_unique<LightSource>(
-        Vector{-105, 74, -272},
-        Color{1, 1, 1}
-    ));
+    reader.ReadFile(scene, "tests/mirrors/scene.obj");
+    // scene.AddShape(std::make_unique<Plane>(
+    //     Vector{-210, 36, -553},
+    //     Vector{105, 38, 281},
+    //     WHITE_MATTE
+    // ));
+    // scene.AddShape(std::make_unique<Sphere>(
+    //     Vector{-80, 90, 35},
+    //     22,
+    //     RED_MATTE
+    // ));
+    // scene.AddShape(std::make_unique<Sphere>(
+    //     Vector{80, 90, 35},
+    //     22,
+    //     GREEN_MATTE
+    // ));
+    // scene.AddShape(std::make_unique<Sphere>(
+    //     Vector{0, 250, 30},
+    //     22,
+    //     BLUE_MATTE
+    // ));
+    // scene.AddLight(std::make_unique<LightSource>(
+    //     Vector{-105, 74, -272},
+    //     Color{1, 1, 1}
+    // ));
 
     // Camera camera{
     //     kWidth,
@@ -157,6 +183,9 @@ int main() {
             std::cerr << "SDL rendering failed: " << SDL_GetError() << '\n';
             break;
         }
+
+        //camera movement
+        camera.Move(Vector(0, 0, .01));
 
     }
 

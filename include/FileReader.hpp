@@ -4,10 +4,12 @@
 #include "Shape.hpp"
 
 #include <string>
+#include <unordered_map>
 
 class FileReader {
 public:
-    void ReadFile(Scene& scene, const std::string& path) const;
+    std::unordered_map<std::string, Material> ReadMtl(const std::string& path) const;
+    void ReadFile(Scene& scene, const std::string& objPath) const;
 
     // later may add more complicated readers
 };

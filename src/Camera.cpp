@@ -42,3 +42,15 @@ int Camera::Height() const {
 Vector Camera::Position() const {
     return _position;
 }
+
+void Rotate(const Vector& axis) {
+    //stub
+    return;
+}
+
+void Camera::Move(const Vector& offset) {
+    _position = _position + offset;
+    _zeroPixelCenter = _position + _forward 
+        - _stepRight * (static_cast<float>(_width - 1) / 2) 
+        + _stepUp * (static_cast<float>(_height - 1) / 2);
+}

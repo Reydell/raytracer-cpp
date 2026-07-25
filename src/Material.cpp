@@ -13,6 +13,10 @@ Pixel Color::ToPixel() const {
     );
 }
 
+bool Color::IsZero() {
+    return !static_cast<bool>(r || b || g); 
+}
+
 Color Color::operator+(const Color& other) const {
     return {
         r + other.r,
