@@ -88,7 +88,7 @@ void FileReader::ReadFile(Scene& scene, const std::string& path) const {
             scene.AddShape(std::make_unique<Sphere>(
                 Vector(x, y, z),
                 radius,
-                DEFAULT
+                GLASS
             ));
         }
     }

@@ -25,7 +25,6 @@
 
 const size_t kWidth = 400;
 const size_t kHeight = 800;
-const int kFpsSampleFrames = 1;
 
 const Pixel kBackgroundColor{0, 0, 0};
 
@@ -85,7 +84,7 @@ int main() {
 
     // Actual raytracer part
 
-    RayTracer raytracer{1};
+    RayTracer raytracer{3};
     Camera camera{
         kWidth,
         kHeight,
@@ -94,6 +93,19 @@ int main() {
     };
     Scene scene;
     reader.ReadFile(scene, "tests/deer.obj");
+    scene.AddLight(std::make_unique<LightSource>(
+        Vector{-105, 74, -272},
+        Color{1, 1, 1}
+    ));
+
+    // Camera camera{
+    //     kWidth,
+    //     kHeight,
+    //     Vector{0, 0, 0},
+    //     Vector{0, 0, -1}
+    // };
+    // Scene scene;
+    // reader.ReadFile(scene, "tests/glass_test.obj");
 
     // std::unique_ptr<Sphere> sph1 = std::make_unique<Sphere>(Vector(0, 0, -6), 2, GLASS);
     // std::unique_ptr<Sphere> sph2 = std::make_unique<Sphere>(Vector(0, 0, -9), 1, CYAN_MATTE);
@@ -117,8 +129,6 @@ int main() {
     // scene.AddLight(std::move(light3));
 
     bool running = true;
-    Uint64 fpsTimer = SDL_GetTicksNS();
-    int fpsFrameCount = 0;
 
     // loop
 
@@ -148,17 +158,9 @@ int main() {
             break;
         }
 
-        if (++fpsFrameCount == kFpsSampleFrames) {
-            const Uint64 now = SDL_GetTicksNS();
-            std::cout << "\033[31mFPS: "
-                      << kFpsSampleFrames * 1e9 / static_cast<double>(now - fpsTimer)
-                      << "\033[0m\n";
-            fpsTimer = now;
-            fpsFrameCount = 0;
-        }
-
     }
 
+    std::cout << '\n';
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

@@ -26,21 +26,25 @@ struct Color{
 struct Material {
     Color emitted;  
     Color diffused;  // coef
+    Color ambient; // same as diffused for now
     Color specular;  // coef
-    Color transparency;  // transparency
+    Color tint; // for light passing through this
 
     float refractionIndex; // for angles
-    Color reflectivity;  // for recursive reflections
+    
+    float transparency; // Tr = 1 - d
+    float reflectivity;
 
-    int32_t specExponent;
+    float specExponent;
 
     Material(
         Color emitted = {0, 0, 0},
-        Color diffused = {.4, .4, .6},
+        Color diffused = {.5, .5, .5},
         Color specular = {.1, .1, .2},
-        Color transparency = {.2, .2, .2},
+        Color tint = {1, 1, 1}, 
         float refractionIndex = 1.3f,
-        Color reflectivity = {0, 0, 0},
-        int32_t specExponent = 500
+        float transparency = 0,
+        float reflectivity = 0,
+        float specExponent = 32
     );
 };

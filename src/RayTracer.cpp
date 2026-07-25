@@ -9,6 +9,7 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -38,10 +39,11 @@ Image RayTracer::Render(const Camera& camera, const Scene& scene) const {
     using Clock = std::chrono::steady_clock;
     const auto renderStart = Clock::now();
     auto lastProgressUpdate = renderStart;
-    constexpr size_t progressBarWidth = 40;
+    constexpr size_t progressBarWidth = 24;
 
-    std::cout << "\rRendering [" << std::string(progressBarWidth, '-')
-              << "]   0% | 0.0s elapsed | -- remaining"
+    std::cout << "\r\033[2KRendering ["
+              << std::string(progressBarWidth, '-')
+              << "]   0% | 0.0s | ETA --"
               << std::flush;
 
     for (size_t x = 0; x < width; ++x) {
@@ -72,23 +74,21 @@ Image RayTracer::Render(const Camera& camera, const Scene& scene) const {
                 static_cast<size_t>(progress * progressBarWidth);
 
             std::ostringstream line;
-            line << "\rRendering ["
+            line << "\r\033[2KRendering ["
                  << std::string(filled, '#')
                  << std::string(progressBarWidth - filled, '-')
                  << "] "
                  << std::setw(3) << static_cast<int>(progress * 100.0)
                  << "% | "
                  << std::fixed << std::setprecision(1)
-                 << elapsed << "s elapsed | "
-                 << remaining << "s remaining"
-                 << "\033[K";
+                 << elapsed << "s | ETA "
+                 << remaining << 's';
 
             std::cout << line.str() << std::flush;
             lastProgressUpdate = now;
         }
     }
 
-    std::cout << '\n';
     return img;
 }
 
@@ -110,7 +110,7 @@ Color RayTracer::TraceRayRecursive(
     Color totalLight = {0, 0, 0};
 
     if (recursionDepth == _recursionDepth) {
-        totalLight += scene.Ambience();
+        totalLight += scene.Ambience() * intersection->material.ambient;
     }
     // emitted
     totalLight += intersection->material.emitted;
@@ -148,7 +148,7 @@ Color RayTracer::TraceRayRecursive(
     Vector dirReflected = 2 * dotNormVieweye * intersection->normal - viewEye;
 
     // reflected ray calculation
-    if (!isInside) {
+    if (!isInside && intersection->material.reflectivity != 0) {
         Color reflected = TraceRayRecursive(
             Ray{intersection->point + 1e-4f * dirReflected, dirReflected}, 
             scene,
@@ -162,7 +162,13 @@ Color RayTracer::TraceRayRecursive(
 
     // refracted ray calculation
 
-    std::optional<Vector> opt_dirRefracted = Refract(ray.Direction(), intersection->normal, refractionIndex, intersection->material.refractionIndex);
+    if (intersection->material.transparency == 0) {
+        return totalLight;
+    }
+
+    float nextRefractionIndex = isInside ? 1.0f : intersection->material.refractionIndex;
+
+    std::optional<Vector> opt_dirRefracted = Refract(ray.Direction(), intersection->normal, refractionIndex, nextRefractionIndex);
     if (!opt_dirRefracted) {
         return totalLight;
     }
@@ -173,9 +179,9 @@ Color RayTracer::TraceRayRecursive(
         scene,
         recursionDepth -1,
         !isInside,
-        intersection->material.refractionIndex
+        nextRefractionIndex
     );
 
 
-    return totalLight + (isInside ? Color{1., 1., 1.} : intersection->material.transparency) * refracted;
+    return totalLight + intersection->material.transparency * (isInside ? Color{1., 1., 1.} : intersection->material.tint) * refracted;
 }

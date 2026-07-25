@@ -1,0 +1,45 @@
+# Glass test scene for the custom OBJ reader.
+# Camera: position (0, 0, 0), forward direction (0, 0, -1).
+# Material assignment is intentionally left to the loader.
+
+# Back wall
+v -4.0 -2.0 -10.0
+v  4.0 -2.0 -10.0
+v  4.0  3.0 -10.0
+v -4.0  3.0 -10.0
+
+# Floor
+v -4.0 -2.0  -2.0
+v  4.0 -2.0  -2.0
+v  4.0 -2.0 -10.0
+v -4.0 -2.0 -10.0
+
+# Left wall
+v -4.0 -2.0  -2.0
+v -4.0 -2.0 -10.0
+v -4.0  3.0 -10.0
+v -4.0  3.0  -2.0
+
+# Right wall
+v 4.0 -2.0  -2.0
+v 4.0  3.0  -2.0
+v 4.0  3.0 -10.0
+v 4.0 -2.0 -10.0
+
+# Tilted panel behind the sphere to make refraction visible
+v -1.6 -1.2 -8.4
+v  1.6 -1.2 -7.8
+v  1.6  1.6 -7.8
+v -1.6  1.6 -8.4
+
+f 1 2 3 4
+f 5 6 7 8
+f 9 10 11 12
+f 13 14 15 16
+f 17 18 19 20
+
+# Sphere centered in front of the panel
+sphere 0.0 0.0 -5.0 1.2
+
+# White point light above and to the left of the camera
+P -2.0 3.0 -1.0 1.0 1.0 1.0

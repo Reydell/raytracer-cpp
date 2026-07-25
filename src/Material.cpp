@@ -70,15 +70,19 @@ Material::Material(
     Color emitted,
     Color diffused,
     Color specular,
-    Color transparency,
+    Color tint,
     float refractionIndex,
-    Color reflectivity,
-    int32_t specExponent
+    float transparency,
+    float reflectivity,
+    float specExponent
 ) : emitted(emitted),
     diffused(diffused),
     specular(specular),
-    transparency(transparency),
+    tint(tint),
     refractionIndex(refractionIndex),
-    reflectivity(reflectivity),
+    transparency(transparency),
     specExponent(specExponent) 
-{}
+{
+    ambient = diffused;
+    this->reflectivity = std::min(reflectivity, 1 - transparency);
+}
