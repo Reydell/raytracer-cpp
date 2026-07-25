@@ -28,9 +28,10 @@ struct Material {
     Color diffused;  // coef
     Color specular;  // coef
     Color transparency;  // transparency
-    Color refractionCoef; // for angles (can be more than 1)
-    Color reflectivity;
-    
+
+    float refractionIndex; // for angles
+    Color reflectivity;  // for recursive reflections
+
     int32_t specExponent;
 
     Material(
@@ -38,7 +39,7 @@ struct Material {
         Color diffused = {.4, .4, .6},
         Color specular = {.1, .1, .2},
         Color transparency = {.2, .2, .2},
-        Color refractionCoef = {1.35, 1.4, 1.45},
+        float refractionIndex = 1.3f,
         Color reflectivity = {0, 0, 0},
         int32_t specExponent = 500
     );

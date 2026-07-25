@@ -71,14 +71,14 @@ Material::Material(
     Color diffused,
     Color specular,
     Color transparency,
-    Color refractionCoef,
+    float refractionIndex,
     Color reflectivity,
     int32_t specExponent
 ) : emitted(emitted),
     diffused(diffused),
     specular(specular),
     transparency(transparency),
-    refractionCoef(refractionCoef),
+    refractionIndex(refractionIndex),
     reflectivity(reflectivity),
     specExponent(specExponent) 
 {}

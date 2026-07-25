@@ -8,6 +8,7 @@
 #include "Image.hpp"
 #include "Material.hpp"
 #include "MaterialPresets.hpp"
+#include "FileReader.hpp"
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -22,9 +23,9 @@
 #include <vector>
 
 
-const size_t kWidth = 800;
-const size_t kHeight = 600;
-const int kFpsSampleFrames = 20;
+const size_t kWidth = 400;
+const size_t kHeight = 800;
+const int kFpsSampleFrames = 1;
 
 const Pixel kBackgroundColor{0, 0, 0};
 
@@ -61,6 +62,7 @@ bool UploadPixelArrayToTexture(SDL_Texture *texture, const Image& img, int width
 }
 
 int main() {
+    FileReader reader;
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window *window = SDL_CreateWindow(
@@ -83,32 +85,36 @@ int main() {
 
     // Actual raytracer part
 
-    RayTracer raytracer;
-    Camera camera{kWidth, kHeight};
-
+    RayTracer raytracer{1};
+    Camera camera{
+        kWidth,
+        kHeight,
+        Vector{105, 150, 290},
+        Vector{-105, -38, -281}
+    };
     Scene scene;
-    std::unique_ptr<Sphere> sph1 = std::make_unique<Sphere>(Vector(0, 0, -6), 1, DIM_LIGHTBULB);
-    std::unique_ptr<Sphere> sph2 = std::make_unique<Sphere>(Vector(2, 2, -8), 1, YELLOW_GLOSSY);
-    std::unique_ptr<Sphere> sph3 = std::make_unique<Sphere>(Vector(-2, -1, -4), 1, CYAN_MATTE);
-    scene.AddShape(std::move(sph1));
-    scene.AddShape(std::move(sph2));
-    scene.AddShape(std::move(sph3));
+    reader.ReadFile(scene, "tests/deer.obj");
 
-    std::unique_ptr<LightSource> light1 = std::make_unique<LightSource>(
-        Vector{6, 0, 0},
-        Color{1, 0, 0}
-    );
-    std::unique_ptr<LightSource> light2 = std::make_unique<LightSource>(
-        Vector{0, 5, 3},
-        Color{0, 1, 0}
-    );
-    std::unique_ptr<LightSource> light3 = std::make_unique<LightSource>(
-        Vector{-7, 2, 4},
-        Color{0, 0, 1}
-    );
-    scene.AddLight(std::move(light1));
-    scene.AddLight(std::move(light2));
-    scene.AddLight(std::move(light3));
+    // std::unique_ptr<Sphere> sph1 = std::make_unique<Sphere>(Vector(0, 0, -6), 2, GLASS);
+    // std::unique_ptr<Sphere> sph2 = std::make_unique<Sphere>(Vector(0, 0, -9), 1, CYAN_MATTE);
+    // scene.AddShape(std::move(sph1));
+    // scene.AddShape(std::move(sph2));
+
+    // std::unique_ptr<LightSource> light1 = std::make_unique<LightSource>(
+    //     Vector{0, 0, 10},
+    //     Color{1, 1, 1}
+    // );
+    // std::unique_ptr<LightSource> light2 = std::make_unique<LightSource>(
+    //     Vector{0, 8, 6},
+    //     Color{1, 1, 1}
+    // );
+    // std::unique_ptr<LightSource> light3 = std::make_unique<LightSource>(
+    //     Vector{-7, 2, 4},
+    //     Color{0, 0, 1}
+    // );
+    // scene.AddLight(std::move(light1));
+    // scene.AddLight(std::move(light2));
+    // scene.AddLight(std::move(light3));
 
     bool running = true;
     Uint64 fpsTimer = SDL_GetTicksNS();

@@ -5,15 +5,22 @@
 #include "Image.hpp"
 
 class RayTracer {
+private:
+    uint8_t _recursionDepth;
+
 public:
+    RayTracer(uint8_t recursionDepth = 2);
     Image Render(const Camera& camera, const Scene& scene) const;
 
-    Color TraceRay(const Camera& camera, const Scene& scene, size_t x, size_t y, [[maybe_unused]] uint8_t depth, [[maybe_unused]] bool isInside) const;
     Color TraceRayRecursive(
         const Ray& ray,
         const Scene& scene,
         uint8_t recursionDepth = 1, 
         bool isInside = false,
-        Color refractionIndex = {1, 1, 1}
+        float refractionIndex = 1
     ) const;
+
+    std::optional<Vector> Refract(const Vector& direction, const Vector& normal, float indexFrom, float indexTo) const;
 };
+
+

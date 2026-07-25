@@ -43,10 +43,13 @@ public:
 class Triangle : public Shape {
 private:
     std::array<Vector, 3> _vertices;
+    Vector _edgeFirst;
+    Vector _edgeSecond;
+    Vector _normal;
 public:
     Triangle(const Vector& first, const Vector& second, const Vector& third, const Material& material);
 
-    Vector operator[](size_t ind) const;
+    const Vector& operator[](size_t ind) const;
 
     std::optional<Intersection> Intersect(const Ray& ray) const override;
 };

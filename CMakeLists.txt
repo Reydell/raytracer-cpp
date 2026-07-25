@@ -34,6 +34,7 @@ add_executable(
     src/RayTracer.cpp 
     src/Scene.cpp 
     src/Shape.cpp 
+    src/FileReader.cpp
 )
 
 target_include_directories(

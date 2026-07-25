@@ -3,7 +3,7 @@ CXX := /usr/bin/clang++
 BUILD_DIR := build
 BUILD_TYPE ?= Debug
 
-.PHONY: all configure build app example clean
+.PHONY: all configure build app release example clean
 
 all: build
 
@@ -18,6 +18,9 @@ build: configure
 app: configure
 	$(CMAKE) --build $(BUILD_DIR) --target raytracer --parallel
 	$(BUILD_DIR)/bin/raytracer
+
+release:
+	$(MAKE) app BUILD_TYPE=Release BUILD_DIR=build-release
 
 example: configure
 	$(CMAKE) --build $(BUILD_DIR) --target sdl_example --parallel
