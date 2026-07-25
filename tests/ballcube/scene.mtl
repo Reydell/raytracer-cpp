@@ -1,0 +1,24 @@
+# Materials for the ballcube scene
+
+newmtl GlassBall
+Ka 0.004 0.006 0.008
+Kd 0.012 0.020 0.024
+Ks 0.18 0.20 0.24
+Ns 256
+Ni 1.10
+Tr 0.92
+Tf 0.94 0.99 0.97
+
+newmtl GreenCube
+Ka 0.010 0.080 0.016
+Kd 0.035 0.72 0.075
+Ks 0.10 0.16 0.11
+Ns 64
+d 1.0
+
+newmtl Ground
+Ka 0.035 0.038 0.045
+Kd 0.30 0.32 0.37
+Ks 0.07 0.08 0.10
+Ns 40
+d 1.0

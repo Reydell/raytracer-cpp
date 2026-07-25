@@ -1,0 +1,29 @@
+# Glass refraction test scene
+# Intended camera: position (0, 0, 0), forward (0, 0, -1)
+
+mtllib Glass.mtl
+
+# Neutral background and floor make the glass silhouette visible.
+usemtl Backdrop
+plane 0 0 -12 0 0 1
+
+usemtl Floor
+plane 0 -1.5 0 0 1 0
+
+# Colored objects behind the glass reveal refraction and tint.
+usemtl Red
+S -1.7 -0.35 -8.5 0.9
+
+usemtl Blue
+S 1.7 -0.35 -8.5 0.9
+
+usemtl Gold
+S 0 1.25 -9.5 0.75
+
+# Main subject.
+usemtl Glass
+S 0 0 -5 1.4
+
+# Key and fill lights.
+P -4 5 1 1.0 0.95 0.90
+P 4 2 -2 0.35 0.45 0.65

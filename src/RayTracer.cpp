@@ -5,14 +5,12 @@
 #include "Scene.hpp"
 
 #include <algorithm>
-#include <chrono>
+#include <atomic>
 #include <cmath>
-#include <iomanip>
-#include <iostream>
-#include <iterator>
+#include <cstddef>
 #include <optional>
-#include <sstream>
-#include <string>
+#include <system_error>
+#include <thread>
 
 RayTracer::RayTracer(uint8_t recursionDepth) : _recursionDepth(recursionDepth) {}
 
@@ -36,16 +34,6 @@ Image RayTracer::Render(const Camera& camera, const Scene& scene) const {
     size_t height = camera.Height();
     Image img{width, height};
 
-    using Clock = std::chrono::steady_clock;
-    const auto renderStart = Clock::now();
-    auto lastProgressUpdate = renderStart;
-    constexpr size_t progressBarWidth = 24;
-
-    std::cout << "\r\033[2KRendering ["
-              << std::string(progressBarWidth, '-')
-              << "]   0% | 0.0s | ETA --"
-              << std::flush;
-
     for (size_t x = 0; x < width; ++x) {
         for (size_t y = 0; y < height; ++y) {
             
@@ -56,36 +44,6 @@ Image RayTracer::Render(const Camera& camera, const Scene& scene) const {
             Color res = this->TraceRayRecursive(ray, scene, _recursionDepth);
             img.At(x, y) = res.ToPixel();
             
-        }
-
-        const size_t completedColumns = x + 1;
-        const auto now = Clock::now();
-        const bool renderFinished = completedColumns == width;
-
-        if (renderFinished ||
-            now - lastProgressUpdate >= std::chrono::milliseconds{100}) {
-            const double progress =
-                static_cast<double>(completedColumns) /
-                static_cast<double>(width);
-            const double elapsed =
-                std::chrono::duration<double>(now - renderStart).count();
-            const double remaining = elapsed * (1.0 - progress) / progress;
-            const size_t filled =
-                static_cast<size_t>(progress * progressBarWidth);
-
-            std::ostringstream line;
-            line << "\r\033[2KRendering ["
-                 << std::string(filled, '#')
-                 << std::string(progressBarWidth - filled, '-')
-                 << "] "
-                 << std::setw(3) << static_cast<int>(progress * 100.0)
-                 << "% | "
-                 << std::fixed << std::setprecision(1)
-                 << elapsed << "s | ETA "
-                 << remaining << 's';
-
-            std::cout << line.str() << std::flush;
-            lastProgressUpdate = now;
         }
     }
 
@@ -184,4 +142,52 @@ Color RayTracer::TraceRayRecursive(
 
 
     return totalLight + intersection->material.transparency * (isInside ? Color{1., 1., 1.} : intersection->material.tint) * refracted;
+}
+
+
+void RayTracer::RenderWorker(
+    const Camera& camera,
+    const Scene& scene,
+    Image& img,
+    std::atomic<size_t>& nextCol
+) const {
+    const size_t width = camera.Width();
+    const size_t height = camera.Height();
+
+    while (true) {
+        const size_t x = nextCol.fetch_add(1u, std::memory_order_relaxed);
+        if (x >= width) {
+            break;
+        }
+        for (size_t y = 0; y < height; ++y) {
+            Ray ray = camera.CastRay(x, y);
+            Color res = this->TraceRayRecursive(ray, scene, _recursionDepth);
+            img.At(x, y) = res.ToPixel();
+        }
+    }
+}
+
+Image  RayTracer::RenderMT(const Camera& camera, const Scene& scene) const {
+    size_t width = camera.Width();
+    size_t height = camera.Height();
+    Image img{width, height};
+    size_t workerCount = std::max(1u, std::thread::hardware_concurrency());
+    // workerCount = std::min(width, workerCount); 
+
+    std::atomic<size_t> nextCol{0};
+
+    std::vector<std::jthread> workers;
+    workers.reserve(workerCount);
+
+    for (size_t i = 0; i < workerCount; ++i) {
+        workers.emplace_back([&, this] {
+            RenderWorker(camera, scene, img, nextCol);
+        });
+    }
+
+    for (std::jthread& worker : workers) {
+        worker.join();
+    }
+
+    return img;   
 }

@@ -1,0 +1,35 @@
+# ballcube: glass sphere with an opaque green cube behind it
+# Intended camera: position (0, 0, 0), forward (0, 0, -1)
+# Both objects sit 0.05 units above the XZ ground plane.
+
+mtllib scene.mtl
+
+usemtl Ground
+plane 0 -1.25 0 0 1 0
+
+# Opaque cube, behind the ball and offset to the right.
+v 0.10 -1.20 -6.15
+v 1.50 -1.20 -6.15
+v 1.50  0.20 -6.15
+v 0.10  0.20 -6.15
+v 0.10 -1.20 -7.55
+v 1.50 -1.20 -7.55
+v 1.50  0.20 -7.55
+v 0.10  0.20 -7.55
+
+usemtl GreenCube
+f 1 2 3 4
+f 5 8 7 6
+f 1 4 8 5
+f 2 6 7 3
+f 4 3 7 8
+f 1 5 6 2
+
+# Glass ball in front of the cube.
+usemtl GlassBall
+S -0.35 -0.20 -5.00 1.00
+
+# Balanced key, fill, and rear lights.
+P -3.0 4.0 -1.0 0.65 0.55 0.48
+P 3.5 2.0 -2.0 0.30 0.38 0.55
+P 0.0 4.0 -8.0 0.18 0.32 0.22

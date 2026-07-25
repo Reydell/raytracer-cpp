@@ -35,11 +35,13 @@ public:
 
     Ray CastRay(int x, int y) const;  // camera will not have its own width and height
 
-    int Width() const;
-    int Height() const;
+    size_t Width() const;
+    size_t Height() const;
 
     Vector Position() const;
 
-    void Rotate(const Vector& axis);  // stub
-    void Move(const Vector& offset);
+    void Rotate(const Vector& axis, float angle);  // rotate relative to camera view
+    void LookAt(const Vector& point); // stub
+    void Move(const Vector& offset); // move relative to camera view
+    void MoveTo(const Vector& point); // stub
 };

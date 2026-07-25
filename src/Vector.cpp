@@ -90,6 +90,13 @@ Vector Vector::operator+(const Vector& other) const {
     );
 }
 
+Vector& Vector::operator+=(const Vector& other) {
+    _data[0] += other[0];
+    _data[1] += other[1];
+    _data[2] += other[2];
+    return *this;
+}
+
 Vector Vector::operator-() const {
     return Vector(
         -_data[0],

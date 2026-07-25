@@ -1,0 +1,40 @@
+# Materials for the testskill scene
+
+newmtl IcosahedronGlass
+Ka 0.004 0.006 0.010
+Kd 0.012 0.020 0.028
+Ks 0.16 0.18 0.24
+Ns 320
+Ni 1.52
+Tr 0.90
+Tf 0.90 0.97 1.00
+
+newmtl Floor
+Ka 0.025 0.028 0.035
+Kd 0.22 0.24 0.30
+Ks 0.08 0.09 0.12
+Ns 48
+
+newmtl Backdrop
+Ka 0.018 0.022 0.032
+Kd 0.10 0.13 0.20
+Ks 0.025 0.030 0.045
+Ns 24
+
+newmtl Magenta
+Ka 0.10 0.008 0.075
+Kd 0.82 0.04 0.55
+Ks 0.18 0.12 0.18
+Ns 80
+
+newmtl Emerald
+Ka 0.008 0.10 0.035
+Kd 0.04 0.80 0.26
+Ks 0.12 0.20 0.14
+Ns 80
+
+newmtl Amber
+Ka 0.11 0.045 0.004
+Kd 0.95 0.38 0.025
+Ks 0.22 0.14 0.08
+Ns 96

@@ -21,10 +21,13 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <chrono>
 
 
 const size_t kWidth = 1200;
 const size_t kHeight = 800;
+const float kMovementSpeed = .1;
+const float kRotationSpeed = .0008;
 
 const Pixel kBackgroundColor{0, 0, 0};
 
@@ -69,6 +72,8 @@ int main() {
         SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY
     );
 
+    SDL_SetWindowRelativeMouseMode(window, true);
+
     SDL_Renderer *renderer = SDL_CreateRenderer(window, nullptr);
 
     SDL_SetRenderLogicalPresentation(renderer, kWidth, kHeight, SDL_LOGICAL_PRESENTATION_LETTERBOX);
@@ -84,80 +89,32 @@ int main() {
 
     // Actual raytracer part
 
-    RayTracer raytracer{3};
+    RayTracer raytracer{6};
     // Camera camera{
     //     kWidth,
     //     kHeight,
     //     Vector{105, 150, 290},
     //     Vector{-105, -38, -281}
     // };
-    Camera camera{
-        kWidth,
-        kHeight,
-        Vector{1.5, 1.5, -0.1},
-        Vector{0, 0, -1}    
-    };
-    Scene scene;
-    reader.ReadFile(scene, "tests/mirrors/scene.obj");
-    // scene.AddShape(std::make_unique<Plane>(
-    //     Vector{-210, 36, -553},
-    //     Vector{105, 38, 281},
-    //     WHITE_MATTE
-    // ));
-    // scene.AddShape(std::make_unique<Sphere>(
-    //     Vector{-80, 90, 35},
-    //     22,
-    //     RED_MATTE
-    // ));
-    // scene.AddShape(std::make_unique<Sphere>(
-    //     Vector{80, 90, 35},
-    //     22,
-    //     GREEN_MATTE
-    // ));
-    // scene.AddShape(std::make_unique<Sphere>(
-    //     Vector{0, 250, 30},
-    //     22,
-    //     BLUE_MATTE
-    // ));
-    // scene.AddLight(std::make_unique<LightSource>(
-    //     Vector{-105, 74, -272},
-    //     Color{1, 1, 1}
-    // ));
-
+    // Scene scene;
+    // reader.ReadFile(scene, "tests/deer/CERF_Free.obj");
     // Camera camera{
     //     kWidth,
     //     kHeight,
-    //     Vector{0, 0, 0},
-    //     Vector{0, 0, -1}
+    //     Vector{1.5, 1.5, -0.1},
+    //     Vector{0, 0, -1}    
     // };
-    // Scene scene;
-    // reader.ReadFile(scene, "tests/glass_test.obj");
-
-    // std::unique_ptr<Sphere> sph1 = std::make_unique<Sphere>(Vector(0, 0, -6), 2, GLASS);
-    // std::unique_ptr<Sphere> sph2 = std::make_unique<Sphere>(Vector(0, 0, -9), 1, CYAN_MATTE);
-    // scene.AddShape(std::move(sph1));
-    // scene.AddShape(std::move(sph2));
-
-    // std::unique_ptr<LightSource> light1 = std::make_unique<LightSource>(
-    //     Vector{0, 0, 10},
-    //     Color{1, 1, 1}
-    // );
-    // std::unique_ptr<LightSource> light2 = std::make_unique<LightSource>(
-    //     Vector{0, 8, 6},
-    //     Color{1, 1, 1}
-    // );
-    // std::unique_ptr<LightSource> light3 = std::make_unique<LightSource>(
-    //     Vector{-7, 2, 4},
-    //     Color{0, 0, 1}
-    // );
-    // scene.AddLight(std::move(light1));
-    // scene.AddLight(std::move(light2));
-    // scene.AddLight(std::move(light3));
+    Scene scene;
+    reader.ReadFile(scene, "tests/box/cube.obj");
+    Camera camera{
+        kWidth,
+        kHeight
+    };
 
     bool running = true;
+    Uint64 previousTicks = SDL_GetTicks();
 
     // loop
-
     while (running) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -169,8 +126,51 @@ int main() {
                 running = false;
             }
         }
-        
-        Image img = raytracer.Render(camera, scene);
+
+        const bool *keyboard = SDL_GetKeyboardState(nullptr);
+
+        Vector offset{0, 0, 0};
+        if (keyboard[SDL_SCANCODE_A]) {
+            offset += Vector{-1, 0, 0};
+        }
+        if (keyboard[SDL_SCANCODE_D]) {
+            offset += Vector{1, 0, 0};
+        }
+        if (keyboard[SDL_SCANCODE_W]) {
+            offset += Vector{0, 0, 1};
+        }
+        if (keyboard[SDL_SCANCODE_S]) {
+            offset += Vector{0, 0, -1};
+        }
+        if (keyboard[SDL_SCANCODE_LCTRL]) {
+            offset += Vector{0, -1, 0};
+        }
+        if (keyboard[SDL_SCANCODE_SPACE]) {
+            offset += Vector{0, 1, 0};
+        }
+        offset.Normalize();
+        camera.Move(offset * kMovementSpeed);
+
+        float mouseDeltaX = .0f;
+        float mouseDeltaY = .0f;
+        SDL_MouseButtonFlags mouseBtns = SDL_GetRelativeMouseState(&mouseDeltaX, &mouseDeltaY);
+        if (mouseBtns & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) {
+            Vector rotationAxisY = Vector(0, 1, 0) * -mouseDeltaX;
+            Vector rotationAxisX = Vector(1, 0, 0) * -mouseDeltaY;
+
+            if (mouseDeltaX or mouseDeltaY) {
+                camera.Rotate(rotationAxisY, kRotationSpeed);
+                camera.Rotate(rotationAxisX, kRotationSpeed);
+            }
+            
+        }
+
+        const auto start = std::chrono::steady_clock::now();
+        Image img = raytracer.RenderMT(camera, scene);
+        const auto end = std::chrono::steady_clock::now();
+        const std::chrono::duration<float> elapsed = end - start;
+        std::cout << "\rRender time: " << elapsed.count()  << " seconds" << std::flush;
+
         UploadPixelArrayToTexture(texture, img, kWidth, kHeight);
 
 
@@ -185,11 +185,10 @@ int main() {
         }
 
         //camera movement
-        camera.Move(Vector(0, 0, .01));
+        // camera.Move(Vector(0, 0, .01));
 
     }
 
-    std::cout << '\n';
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

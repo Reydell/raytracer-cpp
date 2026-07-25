@@ -1,0 +1,4 @@
+interface:
+  display_name: "New Scene"
+  short_description: "Create raytracer OBJ/MTL test scenes"
+  default_prompt: "Use $newscene \"Glass Gallery\" a glass sphere in a lit gallery with colored objects behind it."

@@ -5,6 +5,7 @@ project(raytracer VERSION 0.1.0 LANGUAGES CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(SDL3 CONFIG REQUIRED)
+find_package(Threads REQUIRED)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
@@ -45,6 +46,7 @@ target_include_directories(
 
 target_link_libraries(raytracer PRIVATE SDL3::SDL3)
 configure_raytracer_target(raytracer)
+target_link_libraries(raytracer PRIVATE SDL3::SDL3 Threads::Threads)
 
 add_executable(
     sdl_example

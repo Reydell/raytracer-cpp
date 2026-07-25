@@ -3,6 +3,7 @@
 #include "Camera.hpp"
 #include "Scene.hpp"
 #include "Image.hpp"
+#include <atomic>
 
 class RayTracer {
 private:
@@ -21,6 +22,15 @@ public:
     ) const;
 
     std::optional<Vector> Refract(const Vector& direction, const Vector& normal, float indexFrom, float indexTo) const;
+
+    void RenderWorker(
+        const Camera& camera,
+        const Scene& scene,
+        Image& img,
+        std::atomic<size_t>& nextCol
+    ) const;
+
+    Image RenderMT(const Camera& camera, const Scene& scene) const;
 };
 
 

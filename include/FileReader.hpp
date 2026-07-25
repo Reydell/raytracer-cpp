@@ -2,6 +2,7 @@
 
 #include "Scene.hpp"
 #include "Shape.hpp"
+#include "Camera.hpp"
 
 #include <string>
 #include <unordered_map>

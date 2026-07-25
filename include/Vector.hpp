@@ -18,6 +18,7 @@ public:
     Vector Unit();
 
     Vector operator+(const Vector& other) const;
+    Vector& operator+=(const Vector& other);
     Vector operator-() const;
     Vector operator-(const Vector& other) const;
     

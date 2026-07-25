@@ -1,0 +1,41 @@
+# Materials for Glass.obj
+
+newmtl Glass
+Ka 0.01 0.015 0.02
+Kd 0.02 0.03 0.04
+Ks 0.18 0.20 0.22
+Ns 256
+Ni 1.52
+Tr 0.92
+Tf 0.90 0.97 1.00
+illum 7
+
+newmtl Floor
+Ka 0.10 0.10 0.10
+Kd 0.45 0.45 0.45
+Ks 0.08 0.08 0.08
+Ns 32
+
+newmtl Backdrop
+Ka 0.08 0.09 0.11
+Kd 0.22 0.25 0.30
+Ks 0.02 0.02 0.02
+Ns 16
+
+newmtl Red
+Ka 0.12 0.01 0.01
+Kd 0.75 0.05 0.04
+Ks 0.12 0.12 0.12
+Ns 64
+
+newmtl Blue
+Ka 0.01 0.03 0.12
+Kd 0.04 0.16 0.80
+Ks 0.12 0.12 0.12
+Ns 64
+
+newmtl Gold
+Ka 0.12 0.07 0.01
+Kd 0.90 0.55 0.05
+Ks 0.20 0.16 0.08
+Ns 96
