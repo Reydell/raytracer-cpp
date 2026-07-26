@@ -4,7 +4,7 @@
 
 ## Images
 <img width="2560" height="1575" alt="perfectglasstest" src="https://github.com/user-attachments/assets/95207d6b-8ad1-4588-84ff-9c97600b81df" />
-
+<img width="2624" height="1888" alt="mirrors" src="https://github.com/user-attachments/assets/597b7f3c-0eae-40f4-b8a2-ebf86db8b395" />
 ## Features
 
 1. Rendering spheres, triangles and planes
