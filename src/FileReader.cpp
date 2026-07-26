@@ -1,4 +1,5 @@
 #include "FileReader.hpp"
+#include "LightSource.hpp"
 #include "Material.hpp"
 #include "Vector.hpp"
 #include "MaterialPresets.hpp"
@@ -204,14 +205,12 @@ void FileReader::ReadFile(Scene& scene, const std::string& objPath) const {
         }
     }
 
-    // for (const auto& triangle : faces) {
-    //     scene.AddShape(std::make_unique<Triangle>(
-    //         triangle[0],
-    //         triangle[1],
-    //         triangle[2],
-    //         DEFAULT
-    //     ));
-    // }
+    if (scene.Lights().empty()) {
+        scene.AddLight(std::make_unique<LightSource>(
+            Vector{0, 0, 0},
+            Color{1, 1, 1}
+        ));
+    }
 
     std::cout << "DONE LOADING" << std::endl;
 }

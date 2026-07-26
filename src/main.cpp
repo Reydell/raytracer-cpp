@@ -23,15 +23,23 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <format>
 #include <system_error>
 #include <vector>
 #include <chrono>
 
+#include <future>
+#include <atomic>
+#include <thread>
+
 
 constexpr int kDefaultWidth = 800;
 constexpr int kDefaultHeight = 600;
-const float kMovementSpeed = 1.;
-const float kRotationSpeed = .5;
+float movementSpeed = 1.;
+float rotationSpeed = .5;
+
+std::atomic<bool> lightBlocked{false};
+std::future<void> lightCooldown;
 
 const Pixel kBackgroundColor{0, 0, 0};
 
@@ -216,13 +224,37 @@ int main(int argc, char* argv[]) {
         }
         offset.Normalize();
 
+        if (keyboard[SDL_SCANCODE_LEFTBRACKET]) {
+            movementSpeed -= .01f;
+            SDL_SetWindowTitle(window, std::format("{:.2f}", movementSpeed).c_str());
+        }
+        if (keyboard[SDL_SCANCODE_RIGHTBRACKET]) {
+            movementSpeed += .1f;
+            SDL_SetWindowTitle(window, std::format("{:.2f}", movementSpeed).c_str());
+        }
+        
+        if (keyboard[SDL_SCANCODE_L] && !lightBlocked.exchange(true)) {
+            scene.AddLight(std::make_unique<LightSource>(
+                camera.Position(),
+                Color{1, 1, 1}
+            ));
+            needsRender = true;
+
+            lightCooldown = std::async(
+                std::launch::async,
+                [] {
+                    std::this_thread::sleep_for(std::chrono::seconds(1));
+                    lightBlocked.store(false);
+                }
+            );
+        }
+
         const Uint64 currentTicks = SDL_GetTicks();
         float deltaSeconds = static_cast<float>(currentTicks - previousTicks) / 1000.f;
         previousTicks = currentTicks;
         deltaSeconds = std::min(deltaSeconds, .05f);    
 
-
-        camera.Move(offset * kMovementSpeed * deltaSeconds);
+        camera.Move(offset * movementSpeed * deltaSeconds);
 
         float mouseDeltaX = .0f;
         float mouseDeltaY = .0f;
@@ -233,7 +265,7 @@ int main(int argc, char* argv[]) {
 
             if (mouseDeltaX or mouseDeltaY) {
                 needsRender = true;
-                camera.Rotate((rotationAxisY + rotationAxisX).Unit(), kRotationSpeed * deltaSeconds);
+                camera.Rotate((rotationAxisY + rotationAxisX).Unit(), rotationSpeed * deltaSeconds);
             }
             
         }
@@ -259,9 +291,6 @@ int main(int argc, char* argv[]) {
             std::cerr << "SDL rendering failed: " << SDL_GetError() << '\n';
             break;
         }
-
-        //camera movement
-        // camera.Move(Vector(0, 0, .01));
 
     }
 
