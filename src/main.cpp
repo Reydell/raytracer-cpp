@@ -31,7 +31,7 @@
 const size_t kWidth = 1200;
 const size_t kHeight = 800;
 const float kMovementSpeed = .1;
-const float kRotationSpeed = .0008;
+const float kRotationSpeed = .05;
 
 const Pixel kBackgroundColor{0, 0, 0};
 
@@ -203,8 +203,7 @@ int main(int argc, char* argv[]) {
 
             if (mouseDeltaX or mouseDeltaY) {
                 needsRender = true;
-                camera.Rotate(rotationAxisY, kRotationSpeed);
-                camera.Rotate(rotationAxisX, kRotationSpeed);
+                camera.Rotate((rotationAxisY + rotationAxisX).Unit(), kRotationSpeed);
             }
             
         }
