@@ -225,11 +225,11 @@ int main(int argc, char* argv[]) {
         offset.Normalize();
 
         if (keyboard[SDL_SCANCODE_LEFTBRACKET]) {
-            movementSpeed -= .01f;
+            movementSpeed -= .05f;
             SDL_SetWindowTitle(window, std::format("{:.2f}", movementSpeed).c_str());
         }
         if (keyboard[SDL_SCANCODE_RIGHTBRACKET]) {
-            movementSpeed += .1f;
+            movementSpeed += .05f;
             SDL_SetWindowTitle(window, std::format("{:.2f}", movementSpeed).c_str());
         }
         
