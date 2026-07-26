@@ -28,8 +28,8 @@
 #include <chrono>
 
 
-const size_t kWidth = 1200;
-const size_t kHeight = 800;
+constexpr int kDefaultWidth = 800;
+constexpr int kDefaultHeight = 600;
 const float kMovementSpeed = 1.;
 const float kRotationSpeed = .5;
 
@@ -71,43 +71,66 @@ int main(int argc, char* argv[]) {
     FileReader reader;
     std::string sceneFolder = "ballcube";
     std::uint8_t recursionDepth = 1;
+    int width = kDefaultWidth;
+    int height = kDefaultHeight;
 
     for (int i = 1; i < argc; ++i) {
         const std::string argument = argv[i];
-        if (argument != "-r") {
+        if (argument != "-r" && argument != "-w" && argument != "-h") {
+            if (!argument.empty() && argument.front() == '-') {
+                std::cerr << "Unknown option: " << argument << '\n';
+                return 1;
+            }
             sceneFolder = argument;
             continue;
         }
 
         if (++i >= argc) {
-            std::cerr << "Missing recursion depth after -r\n";
+            std::cerr << "Missing value after " << argument << '\n';
             return 1;
         }
 
-        unsigned int parsedDepth = 0;
-        const std::string depthArgument = argv[i];
+        unsigned int parsedValue = 0;
+        const std::string valueArgument = argv[i];
         const auto [end, error] = std::from_chars(
-            depthArgument.data(),
-            depthArgument.data() + depthArgument.size(),
-            parsedDepth
+            valueArgument.data(),
+            valueArgument.data() + valueArgument.size(),
+            parsedValue
         );
         if (
             error != std::errc{} ||
-            end != depthArgument.data() + depthArgument.size() ||
-            parsedDepth == 0 ||
-            parsedDepth > std::numeric_limits<std::uint8_t>::max()
+            end != valueArgument.data() + valueArgument.size() ||
+            parsedValue == 0
         ) {
-            std::cerr << "Recursion depth must be an integer from 1 to 255\n";
+            std::cerr << "Value after " << argument << " must be a positive integer\n";
             return 1;
         }
 
-        recursionDepth = static_cast<std::uint8_t>(parsedDepth);
+        if (argument == "-r") {
+            if (parsedValue > std::numeric_limits<std::uint8_t>::max()) {
+                std::cerr << "Recursion depth must be an integer from 1 to 255\n";
+                return 1;
+            }
+            recursionDepth = static_cast<std::uint8_t>(parsedValue);
+            continue;
+        }
+
+        if (parsedValue > static_cast<unsigned int>(std::numeric_limits<int>::max())) {
+            std::cerr << "Image dimensions are too large\n";
+            return 1;
+        }
+
+        if (argument == "-w") {
+            width = static_cast<int>(parsedValue);
+        } else {
+            height = static_cast<int>(parsedValue);
+        }
     }
 
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window *window = SDL_CreateWindow(
-        "Raytracer", kWidth, kHeight,
+        "Raytracer", width, height,
         SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY
     );
 
@@ -115,13 +138,13 @@ int main(int argc, char* argv[]) {
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, nullptr);
 
-    SDL_SetRenderLogicalPresentation(renderer, kWidth, kHeight, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+    SDL_SetRenderLogicalPresentation(renderer, width, height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
     SDL_SetRenderVSync(renderer, 1);
 
     SDL_Texture *texture = SDL_CreateTexture(
         renderer, SDL_PIXELFORMAT_RGBA32,
         SDL_TEXTUREACCESS_STREAMING,
-        kWidth, kHeight
+        width, height
     );
 
     SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
@@ -130,16 +153,16 @@ int main(int argc, char* argv[]) {
 
     RayTracer raytracer{recursionDepth};
     // Camera camera{
-    //     kWidth,
-    //     kHeight,
+    //     width,
+    //     height,
     //     Vector{105, 150, 290},
     //     Vector{-105, -38, -281}
     // };
     // Scene scene;
     // reader.ReadFile(scene, "deer");
     Camera camera{
-        kWidth,
-        kHeight,
+        static_cast<float>(width),
+        static_cast<float>(height),
         Vector{1.5, 1.5, -0.1},
         Vector{0, 0, -1}    
     };
@@ -221,7 +244,7 @@ int main(int argc, char* argv[]) {
             const std::chrono::duration<float> elapsed = end - start;
             std::cout << "\rRender time: " << elapsed.count()  << " seconds" << std::flush;
 
-            UploadPixelArrayToTexture(texture, img, kWidth, kHeight);
+            UploadPixelArrayToTexture(texture, img, width, height);
             needsRender = false;
         }
         

@@ -23,10 +23,22 @@ The provided `Makefile` expects the compiler at `/usr/bin/clang++`.
 
 ## Run
 
-`make release <folder> -r 3`
+```sh
+make release <folder>
+make release <folder> -- -r 3 -w 1024 -h 768
+```
 
 - `folder` is the name of the folder inside `tests/` (e.g `ballcube`)
 - `-r` is the recursion depth (technically it's the number of steps)
+- `-w` is the image width (default: `800`)
+- `-h` is the image height (default: `600`)
+
+The `--` is required before the flags because `make` has its own `-h` option.
+Dimensions can also be passed as Make variables:
+
+```sh
+make debug <folder> WIDTH=1024 HEIGHT=768
+```
 
 Currently minimal recursion depth is 1 (which means only the primary ray is calculated)
 
