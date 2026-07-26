@@ -1,0 +1,11 @@
+# Fully initialized material for the human scene
+
+newmtl default
+Ke 0.000 0.000 0.000
+Ka 0.070 0.038 0.026
+Kd 0.620 0.330 0.230
+Ks 0.120 0.095 0.080
+Tf 1.000 1.000 1.000
+Ni 1.00
+al 1.00 0.04 0.00
+Ns 72
