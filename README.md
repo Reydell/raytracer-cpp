@@ -29,3 +29,7 @@ The provided `Makefile` expects the compiler at `/usr/bin/clang++`.
 - `-r` is the recursion depth (technically it's the number of steps)
 
 Currently minimal recursion depth is 1 (which means only the primary ray is calculated)
+
+# TODO
+
+- light occlusion and distance to source

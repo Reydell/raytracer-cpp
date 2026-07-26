@@ -30,8 +30,8 @@
 
 const size_t kWidth = 1200;
 const size_t kHeight = 800;
-const float kMovementSpeed = .1;
-const float kRotationSpeed = .0008;
+const float kMovementSpeed = 1.;
+const float kRotationSpeed = .5;
 
 const Pixel kBackgroundColor{0, 0, 0};
 
@@ -192,7 +192,14 @@ int main(int argc, char* argv[]) {
             needsRender = true;
         }
         offset.Normalize();
-        camera.Move(offset * kMovementSpeed);
+
+        const Uint64 currentTicks = SDL_GetTicks();
+        float deltaSeconds = static_cast<float>(currentTicks - previousTicks) / 1000.f;
+        previousTicks = currentTicks;
+        deltaSeconds = std::min(deltaSeconds, .05f);    
+
+
+        camera.Move(offset * kMovementSpeed * deltaSeconds);
 
         float mouseDeltaX = .0f;
         float mouseDeltaY = .0f;
@@ -203,8 +210,7 @@ int main(int argc, char* argv[]) {
 
             if (mouseDeltaX or mouseDeltaY) {
                 needsRender = true;
-                camera.Rotate(rotationAxisY, kRotationSpeed);
-                camera.Rotate(rotationAxisX, kRotationSpeed);
+                camera.Rotate((rotationAxisY + rotationAxisX).Unit(), kRotationSpeed * deltaSeconds);
             }
             
         }

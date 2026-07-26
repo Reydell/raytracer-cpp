@@ -1,5 +1,4 @@
 .clangd
-examples/
 .questions.md
 build/
 build-release/
