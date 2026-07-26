@@ -6,6 +6,7 @@
 
 #include "Material.hpp"
 #include "Vector.hpp"
+#include "BVH.hpp"
 
 class Ray;
 
@@ -22,9 +23,12 @@ public:
     virtual ~Shape() = default;
 
     Material GetMaterial() const;
+    virtual std::optional<Box> GetBox() const;
 
 protected:
     explicit Shape(const Material& material) : _material(material) {}
+    virtual void CalculateBox() = 0;
+    Box _box;
 
 private:
     Material _material;
@@ -38,6 +42,9 @@ public:
     Sphere(const Vector& center, float radius, const Material& material);
 
     std::optional<Intersection> Intersect(const Ray& ray) const override;
+
+protected:
+    void CalculateBox() override;
 };
 
 class Triangle : public Shape {
@@ -52,6 +59,9 @@ public:
     const Vector& operator[](size_t ind) const;
 
     std::optional<Intersection> Intersect(const Ray& ray) const override;
+
+protected:
+    void CalculateBox() override;
 };
 
 class Plane : public Shape {
@@ -62,4 +72,10 @@ public:
     Plane(const Vector& origin, const Vector& normal, const Material& material);
 
     std::optional<Intersection> Intersect(const Ray& ray) const override;
+
+    std::optional<Box> GetBox() const override;
+
+protected:
+    void CalculateBox() override;
+    
 };

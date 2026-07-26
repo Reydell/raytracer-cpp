@@ -14,12 +14,16 @@
 #include <SDL3/SDL_main.h>
 
 #include <algorithm>
+#include <charconv>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
+#include <limits>
 #include <memory>
+#include <string>
+#include <system_error>
 #include <vector>
 #include <chrono>
 
@@ -63,8 +67,43 @@ bool UploadPixelArrayToTexture(SDL_Texture *texture, const Image& img, int width
   return true;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     FileReader reader;
+    std::string sceneFolder = "ballcube";
+    std::uint8_t recursionDepth = 1;
+
+    for (int i = 1; i < argc; ++i) {
+        const std::string argument = argv[i];
+        if (argument != "-r") {
+            sceneFolder = argument;
+            continue;
+        }
+
+        if (++i >= argc) {
+            std::cerr << "Missing recursion depth after -r\n";
+            return 1;
+        }
+
+        unsigned int parsedDepth = 0;
+        const std::string depthArgument = argv[i];
+        const auto [end, error] = std::from_chars(
+            depthArgument.data(),
+            depthArgument.data() + depthArgument.size(),
+            parsedDepth
+        );
+        if (
+            error != std::errc{} ||
+            end != depthArgument.data() + depthArgument.size() ||
+            parsedDepth == 0 ||
+            parsedDepth > std::numeric_limits<std::uint8_t>::max()
+        ) {
+            std::cerr << "Recursion depth must be an integer from 1 to 255\n";
+            return 1;
+        }
+
+        recursionDepth = static_cast<std::uint8_t>(parsedDepth);
+    }
+
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window *window = SDL_CreateWindow(
@@ -89,7 +128,7 @@ int main() {
 
     // Actual raytracer part
 
-    RayTracer raytracer{6};
+    RayTracer raytracer{recursionDepth};
     // Camera camera{
     //     kWidth,
     //     kHeight,
@@ -98,21 +137,19 @@ int main() {
     // };
     // Scene scene;
     // reader.ReadFile(scene, "deer");
-    // Camera camera{
-    //     kWidth,
-    //     kHeight,
-    //     Vector{1.5, 1.5, -0.1},
-    //     Vector{0, 0, -1}    
-    // };
-    Scene scene;
-    reader.ReadFile(scene, "heart");
     Camera camera{
         kWidth,
-        kHeight
+        kHeight,
+        Vector{1.5, 1.5, -0.1},
+        Vector{0, 0, -1}    
     };
+    Scene scene;
+    reader.ReadFile(scene, sceneFolder);
+    scene.BuildHierarchy();
 
     bool running = true;
     Uint64 previousTicks = SDL_GetTicks();
+    bool needsRender = true;
 
     // loop
     while (running) {
@@ -129,32 +166,30 @@ int main() {
 
         const bool *keyboard = SDL_GetKeyboardState(nullptr);
 
-        bool hasMoved = false;
-
         Vector offset{0, 0, 0};
         if (keyboard[SDL_SCANCODE_A]) {
             offset += Vector{-1, 0, 0};
-            hasMoved = true;
+            needsRender = true;
         }
         if (keyboard[SDL_SCANCODE_D]) {
             offset += Vector{1, 0, 0};
-            hasMoved = true;
+            needsRender = true;
         }
         if (keyboard[SDL_SCANCODE_W]) {
             offset += Vector{0, 0, 1};
-            hasMoved = true;
+            needsRender = true;
         }
         if (keyboard[SDL_SCANCODE_S]) {
             offset += Vector{0, 0, -1};
-            hasMoved = true;
+            needsRender = true;
         }
         if (keyboard[SDL_SCANCODE_LCTRL]) {
             offset += Vector{0, -1, 0};
-            hasMoved = true;
+            needsRender = true;
         }
         if (keyboard[SDL_SCANCODE_SPACE]) {
             offset += Vector{0, 1, 0};
-            hasMoved = true;
+            needsRender = true;
         }
         offset.Normalize();
         camera.Move(offset * kMovementSpeed);
@@ -167,13 +202,13 @@ int main() {
             Vector rotationAxisX = Vector(1, 0, 0) * -mouseDeltaY;
 
             if (mouseDeltaX or mouseDeltaY) {
-                hasMoved = true;
+                needsRender = true;
                 camera.Rotate(rotationAxisY, kRotationSpeed);
                 camera.Rotate(rotationAxisX, kRotationSpeed);
             }
             
         }
-        if (hasMoved) {
+        if (needsRender) {
             const auto start = std::chrono::steady_clock::now();
             Image img = raytracer.RenderMT(camera, scene);
             const auto end = std::chrono::steady_clock::now();
@@ -181,6 +216,7 @@ int main() {
             std::cout << "\rRender time: " << elapsed.count()  << " seconds" << std::flush;
 
             UploadPixelArrayToTexture(texture, img, kWidth, kHeight);
+            needsRender = false;
         }
         
 

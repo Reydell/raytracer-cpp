@@ -4,8 +4,10 @@
 
 #include "Shape.hpp"
 #include "Vector.hpp"
+#include "BVH.hpp"
 
 class Shape;
+
 
 class Ray {
 private:
@@ -19,5 +21,6 @@ public:
     const Vector& Origin() const;
 
     std::optional<Intersection> Intersect(const Shape& shape) const;
+    bool IntersectBox(const Box& box) const;
     
 };

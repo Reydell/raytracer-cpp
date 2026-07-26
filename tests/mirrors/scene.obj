@@ -1,0 +1,21 @@
+# mirrors: an off-center ball inside a mirrored cube
+# Intended camera: position (1.5, 1.5, -0.1), forward (0, 0, -1)
+# The six planes form an 8 x 8 x 8 box centered on the camera.
+
+mtllib scene.mtl
+
+usemtl Mirror
+plane -2.5  1.5 -0.1  1  0  0
+plane  5.5  1.5 -0.1 -1  0  0
+plane  1.5 -2.5 -0.1  0  1  0
+plane  1.5  5.5 -0.1  0 -1  0
+plane  1.5  1.5 -4.1  0  0  1
+plane  1.5  1.5  3.9  0  0 -1
+
+# A warm ball below and to the right of the box center.
+usemtl WarmBall
+S 2.4 0.3 -2.5 0.75
+
+# Cool overhead key and warm side fill, both inside the enclosure.
+P -0.75 4.25 -1.25 0.55 0.72 1.00
+P  4.25 0.25  1.25 0.90 0.48 0.25

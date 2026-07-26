@@ -1,0 +1,21 @@
+# Fully initialized materials for the mirrors scene
+
+newmtl Mirror
+Ke 0.002 0.004 0.008
+Ka 0.012 0.016 0.024
+Kd 0.070 0.090 0.130
+Ks 0.550 0.620 0.720
+Tf 1.000 1.000 1.000
+Ni 1.00
+al 0.20 0.88 0.00
+Ns 700
+
+newmtl WarmBall
+Ke 0.018 0.003 0.001
+Ka 0.110 0.014 0.006
+Kd 0.850 0.090 0.025
+Ks 0.300 0.220 0.160
+Tf 1.000 1.000 1.000
+Ni 1.00
+al 0.95 0.18 0.00
+Ns 180

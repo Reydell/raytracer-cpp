@@ -34,6 +34,7 @@ add_executable(
     src/Ray.cpp 
     src/RayTracer.cpp 
     src/Scene.cpp 
+    src/BVH.cpp
     src/Shape.cpp 
     src/FileReader.cpp
 )

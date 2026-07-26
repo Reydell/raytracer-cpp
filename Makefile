@@ -3,7 +3,34 @@ CXX := /usr/bin/clang++
 BUILD_DIR := build
 BUILD_TYPE ?= Debug
 
-.PHONY: all configure build app release example clean
+KNOWN_GOALS := all configure build debug release example clean
+RAW_ARGS := $(filter-out $(KNOWN_GOALS),$(MAKECMDGOALS))
+POSITIONAL_ARGS := $(filter-out -r,$(RAW_ARGS))
+HAS_RECURSION_FLAG := $(or \
+	$(filter -r,$(RAW_ARGS)), \
+	$(findstring r,$(firstword $(MAKEFLAGS))))
+
+ifneq ($(HAS_RECURSION_FLAG),)
+ifneq ($(word 2,$(POSITIONAL_ARGS)),)
+SCENE_GOAL := $(firstword $(POSITIONAL_ARGS))
+RECURSION_GOAL := $(word 2,$(POSITIONAL_ARGS))
+else
+RECURSION_GOAL := $(firstword $(POSITIONAL_ARGS))
+endif
+else
+SCENE_GOAL := $(firstword $(POSITIONAL_ARGS))
+endif
+
+SCENE ?= $(if $(SCENE_GOAL),$(SCENE_GOAL),ballcube)
+RECURSION ?= $(if $(RECURSION_GOAL),$(RECURSION_GOAL),1)
+
+ifneq ($(RAW_ARGS),)
+.PHONY: $(RAW_ARGS)
+$(RAW_ARGS):
+	@:
+endif
+
+.PHONY: all configure build debug release example clean
 
 all: build
 
@@ -15,12 +42,13 @@ configure:
 build: configure
 	$(CMAKE) --build $(BUILD_DIR) --parallel
 
-app: configure
+debug: configure
 	$(CMAKE) --build $(BUILD_DIR) --target raytracer --parallel
-	$(BUILD_DIR)/bin/raytracer
+	$(BUILD_DIR)/bin/raytracer $(SCENE) -r $(RECURSION)
 
 release:
-	$(MAKE) app BUILD_TYPE=Release BUILD_DIR=build-release
+	$(MAKE) debug BUILD_TYPE=Release BUILD_DIR=build-release \
+		SCENE=$(SCENE) RECURSION=$(RECURSION)
 
 example: configure
 	$(CMAKE) --build $(BUILD_DIR) --target sdl_example --parallel

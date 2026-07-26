@@ -1,6 +1,8 @@
 #include "Shape.hpp"
+#include "BVH.hpp"
 #include "Material.hpp"
 #include "Ray.hpp"
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <optional>
@@ -9,11 +11,17 @@ Material Shape::GetMaterial() const {
     return _material;
 }
 
+std::optional<Box> Shape::GetBox() const {
+    return _box;
+}
+
 Sphere::Sphere(const Vector& center, float radius, const Material& material) 
     : Shape(material),
       _radius{radius},
       _center{center}
-{}
+{
+    CalculateBox();
+}
 
 std::optional<Intersection> Sphere::Intersect(const Ray& ray) const {
     float b = 2 * Dot(ray.Direction(), ray.Origin() - _center);
@@ -51,6 +59,14 @@ std::optional<Intersection> Sphere::Intersect(const Ray& ray) const {
     return std::nullopt;
 }
 
+void Sphere::CalculateBox() {
+    _box = {
+        _center - Vector{_radius, _radius, _radius},
+        _center + Vector{_radius, _radius, _radius},
+        _center
+    };
+}
+
 Triangle::Triangle(
     const Vector& first,
     const Vector& second,
@@ -63,6 +79,7 @@ Triangle::Triangle(
     _edgeFirst = _vertices[1] - _vertices[0];
     _edgeSecond = _vertices[2] - _vertices[0];
     _normal = Cross(_edgeFirst, _edgeSecond).Unit();
+    CalculateBox();
 }
 
 const Vector& Triangle::operator[](size_t ind) const {
@@ -116,6 +133,18 @@ std::optional<Intersection> Triangle::Intersect(const Ray& ray) const {
     };
 }
 
+void Triangle::CalculateBox() {
+    const auto [minX, maxX] = std::minmax({_vertices[0][0], _vertices[1][0], _vertices[2][0]});
+    const auto [minY, maxY] = std::minmax({_vertices[0][1], _vertices[1][1], _vertices[2][1]});
+    const auto [minZ, maxZ] = std::minmax({_vertices[0][2], _vertices[1][2], _vertices[2][2]});
+
+    _box = {
+        {minX, minY, minZ},
+        {maxX, maxY, maxZ},
+        (_vertices[0] + _vertices[1] + _vertices[2]) / 3.f
+    };
+}
+
 Plane::Plane(const Vector& origin, const Vector& normal, const Material& material) 
     : Shape(material),
       _origin(origin),
@@ -141,4 +170,12 @@ std::optional<Intersection> Plane::Intersect(const Ray& ray) const {
         Dot(ray.Direction(), _normal) < 0 ? _normal : -_normal,
         GetMaterial()
     };
+}
+
+std::optional<Box> Plane::GetBox() const {
+    return std::nullopt;
+}
+
+void Plane::CalculateBox() {
+    return;  // just overrides a virtual method of Shape
 }
