@@ -17,5 +17,5 @@ usemtl WarmBall
 S 2.4 0.3 -2.5 0.75
 
 # Cool overhead key and warm side fill, both inside the enclosure.
-P -0.75 4.25 -1.25 0.55 0.72 1.00
-P  4.25 0.25  1.25 0.90 0.48 0.25
+P -0.75 4.25 -1.25 1. 1. 1.
+P  4.25 0.25  1.25 0.48 0.48 0.48
