@@ -9,6 +9,7 @@
 3. Balanced multithreaded rendering (currently no GPU support)
 4. Bounding volume hierarchy
 5. Movement (WASD) and camera rotation (hold LMB + drag)
+6. Codex skill `$newscene "scene_name" prompt` to generate new scenes
 
 ## Requirements
 
