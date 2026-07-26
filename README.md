@@ -47,6 +47,8 @@ make debug <folder> WIDTH=1024 HEIGHT=768
 
 Currently minimal recursion depth is 1 (which means only the primary ray is calculated)
 
+Press `L` to add a light source at camera position.
+
 # TODO
 
 - light occlusion and distance to source
